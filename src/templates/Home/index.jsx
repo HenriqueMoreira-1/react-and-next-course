@@ -8,7 +8,7 @@ class App extends Component {
     posts: [],
     allPosts: [],
     page: 0,
-    postPerPage: 2,
+    postPerPage: 53,
   };
 
   async componentDidMount() {
@@ -25,16 +25,27 @@ class App extends Component {
   };
 
   loadMorePosts = () => {
-    console.log("Chamado");
+    const { page, postPerPage, allPosts, posts } = this.state;
+    const nextPage = page + postPerPage;
+    const nextPosts = allPosts.slice(nextPage, nextPage + postPerPage);
+    posts.push(...nextPosts);
+
+    this.setState({ posts, page: nextPage });
   };
 
   render() {
-    const { posts } = this.state;
-
+    const { posts, page, postPerPage, allPosts } = this.state;
+    const noMorePosts = page + postPerPage >= allPosts.length;
     return (
       <section className="container">
         <Posts posts={posts} />
-        <Button text="Load More Posts" onClick={this.loadMorePosts} />
+        <div className="button-container">
+          <Button
+            text="Load More Posts"
+            onClick={this.loadMorePosts}
+            disabled={noMorePosts}
+          />
+        </div>
       </section>
     );
   }
