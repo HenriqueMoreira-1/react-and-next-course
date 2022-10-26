@@ -51,7 +51,7 @@ export const Home = () => {
         <TextInput searchValue={searchValue} handleChange={handleChange} />
       </div>
       {filteredPosts.length > 0 && <Posts posts={filteredPosts} />}
-      {filteredPosts.length === 0 && <h1>Não existem posts =(</h1>}
+      {filteredPosts.length === 0 && <h1>Não existem posts</h1>}
       <div className="button-container">
         {!searchValue && (
           <Button
