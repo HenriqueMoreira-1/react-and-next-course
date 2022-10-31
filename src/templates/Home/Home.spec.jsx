@@ -6,6 +6,7 @@ import {
   waitForElementToBeRemoved,
 } from "@testing-library/react";
 import { Home } from ".";
+import userEvent from "@testing-library/user-event";
 
 const handlers = [
   rest.get("*jsonplaceholder.typicode.com*", async (req, res, ctx) => {
@@ -56,6 +57,71 @@ describe("<Home />", () => {
     render(<Home />);
     const noMorePosts = screen.getByText("Não existem posts");
 
+    expect.assertions(3);
+
     await waitForElementToBeRemoved(noMorePosts);
+
+    const search = screen.getByPlaceholderText(/type your search/i);
+    expect(search).toBeInTheDocument();
+
+    const images = screen.getAllByRole("img");
+    expect(images).toHaveLength(3);
+
+    const button = screen.getByRole("button", { name: "Load More Posts" });
+    expect(button).toBeInTheDocument();
+  });
+  it("should search for posts", async () => {
+    render(<Home />);
+    const noMorePosts = screen.getByText("Não existem posts");
+
+    expect.assertions(13);
+
+    await waitForElementToBeRemoved(noMorePosts);
+
+    const search = screen.getByPlaceholderText(/type your search/i);
+    expect(
+      screen.getByRole("heading", { name: "title1 1" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "title2 2" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "title3 3" })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "title4 4" })
+    ).not.toBeInTheDocument();
+
+    userEvent.type(search, "title1");
+    expect(
+      screen.getByRole("heading", { name: "title1 1" })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "title2 2" })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "title3 3" })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "title4 4" })
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole("heading", { name: "Search Value: title1" })
+    ).toBeInTheDocument();
+
+    userEvent.clear(search);
+    expect(
+      screen.getByRole("heading", { name: "title1 1" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "title2 2" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "title3 3" })
+    ).toBeInTheDocument();
+
+    userEvent.type(search, "blablablabla");
+    expect(screen.getByText("Não existem posts")).toBeInTheDocument();
   });
 });
